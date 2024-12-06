@@ -51,7 +51,7 @@ viajes que tuvieron como inicio o destino aeropuertos, que hayan pagado con dine
 
             from pyspark.sql.functions import col, when, lit
 
-    # Crear la sesión de Spark con soporte para Hive
+    # Crear la sesión de Spark
 
     spark = SparkSession.builder \
     .appName("Airport Trips Processing") \
@@ -84,10 +84,10 @@ viajes que tuvieron como inicio o destino aeropuertos, que hayan pagado con dine
 
     airport_trips_df = filtered_df.withColumn(
         "airport_fee",
-        when(col("PULocationID").isin([132, 138]), lit(1.25)).otherwise(lit(0.0))  # Supón que 132 y 138 son los códigos de JFK y LaGuardia
+        when(col("PULocationID").isin([132, 138]), lit(1.25)).otherwise(lit(0.0))  # 132 y 138 son los códigos de JFK y LaGuardia
     )
 
-    # Seleccionar las columnas necesarias para la tabla airport_trips
+    # columnas necesarias para la tabla airport_trips
 
     airport_trips_df = airport_trips_df.select(
         col("tpep_pickup_datetime").cast("string"),
@@ -97,7 +97,7 @@ viajes que tuvieron como inicio o destino aeropuertos, que hayan pagado con dine
         col("total_amount").cast("double")
     )
 
-    # Paso 5: Insertar los registros en la tabla airport_trips en Hive
+    # Insertar los registros en la tabla airport_trips en Hive
 
     print("Insertando los registros en la tabla airport_trips de Hive...")
     airport_trips_df.write.mode("append").insertInto("tripdata.airport_trips")
@@ -118,7 +118,7 @@ base de datos)
     from airflow.providers.apache.spark.operators.spark_submit import SparkSubmitOperator
     from datetime import datetime, timedelta
 
-    # Definir argumentos básicos para el DAG
+    # argumentos básicos para el DAG
 
     default_args = {
         'owner': 'Lucas Leonetti',
@@ -144,7 +144,7 @@ base de datos)
             bash_command='/usr/bin/sh /home/hadoop/scripts/landing.sh ',
         )
 
-        # Task 2: Ejecutar el Script PySpark para Procesar los Datos usando BashOperator
+        # Task 2: PySpark para Procesar los Datos usando BashOperator
         spark_job = BashOperator(
             task_id='spark_job',
             bash_command='ssh hadoop@172.17.0.2 /home/hadoop/spark/bin/spark-submit --files /home/hadoop/hive/conf/hive-site.xml /home/hadoop/scripts/airport_trips_ingestion.py ',

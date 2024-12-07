@@ -1,4 +1,4 @@
-# Clase 7 - Ejercitacion Airflow
+# Clase 7 - Ejercitacion Airflow y Spark. Taxis en NYC
 
 ## Ejercicios
 
@@ -49,7 +49,7 @@ viajes que tuvieron como inicio o destino aeropuertos, que hayan pagado con dine
 
     from pyspark.sql import SparkSession
 
-            from pyspark.sql.functions import col, when, lit
+    from pyspark.sql.functions import col, when, lit
 
     # Crear la sesión de Spark
 

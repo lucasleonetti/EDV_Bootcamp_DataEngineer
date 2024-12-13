@@ -303,6 +303,8 @@ Luego arrancamos el DAG que toma la información de Kafka y la envía a Hive:
 
 ![alt text](image-9.png)
 
+![alt text](image-12.png)
+
 ## Aplication Yarn
 
 ![alt text](image-8.png)

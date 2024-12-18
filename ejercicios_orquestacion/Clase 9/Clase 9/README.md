@@ -195,6 +195,8 @@ northwind_analytics en la tabla products_sold, los datos del punto 2, pero solam
 aquellas compañías en las que la cantidad de productos vendidos fue mayor al
 promedio.
 
+    insert_products_sold.py
+
     ```python
     from pyspark.sql import SparkSession
     from pyspark.sql.functions import col, avg
@@ -209,7 +211,7 @@ promedio.
 
     # Ruta del directorio de HDFS donde está el archivo Parquet importado (punto 2)
 
-    input_path = "/sqoop/ingest/clientes"
+    input_path = "hdfs://172.17.0.3:9000/sqoop/ingest/clientes" 
 
     # Nombre de la base de datos y tabla de destino en Hive
 
@@ -250,6 +252,8 @@ order_id, shipped_date, company_name, phone, unit_price_discount (unit_price wit
 discount), quantity, total_price (unit_price_discount * quantity). Solo de aquellos pedidos
 que hayan tenido descuento.
 
+    insert_products_sent.py
+
     ```python
     from pyspark.sql import SparkSession
     from pyspark.sql.functions import col, expr
@@ -264,8 +268,8 @@ que hayan tenido descuento.
 
     # Ruta de los archivos Parquet en HDFS (puntos 3 y 4)
 
-    orders_path = "/sqoop/ingest/envios"  # Punto 3
-    order_details_path = "/sqoop/ingest/order_details"  # Punto 4
+    orders_path = "hdfs://172.17.0.3:9000/sqoop/ingest/envios"  # Punto 3
+    order_details_path = "hdfs://172.17.0.3:9000/sqoop/ingest/order_details"  # Punto 4
 
     # Nombre de la base de datos y tabla de destino en Hive
 
@@ -367,36 +371,51 @@ de datos)
         with TaskGroup("ingest_stage") as ingest_stage:
             ingest_clientes = BashOperator(
                 task_id='ingest_clientes',
-                bash_command='/usr/bin/sh /home/hadoop/scripts/ej9_sqoop/import_clientes_sqoop.sh '
+                bash_command="""
+                export PATH=/home/hadoop/hadoop/bin:/usr/lib/sqoop/bin:$PATH &&
+                /usr/bin/sh /home/hadoop/scripts/ej9_sqoop/import_clientes_sqoop.sh
+                """
             )
 
             ingest_envios = BashOperator(
                 task_id='ingest_envios',
-                bash_command='/usr/bin/sh /home/hadoop/scripts/ej9_sqoop/import_envios_sqoop.sh '
+                bash_command="""
+                export PATH=/home/hadoop/hadoop/bin:/usr/lib/sqoop/bin:$PATH &&
+                /usr/bin/sh /home/hadoop/scripts/ej9_sqoop/import_envios_sqoop.sh
+                """
             )
 
             ingest_detalles = BashOperator(
                 task_id='ingest_detalles',
-                bash_command='/usr/bin/sh /home/hadoop/scripts/ej9_sqoop/import_order_details.sh '
+                bash_command="""
+                export PATH=/home/hadoop/hadoop/bin:/usr/lib/sqoop/bin:$PATH &&
+                /usr/bin/sh /home/hadoop/scripts/ej9_sqoop/import_order_details.sh
+                """
             )
 
             # Dependencias en la etapa de ingestión
-            [ingest_clientes, ingest_envios, ingest_detalles]
+            [ingest_clientes >> ingest_envios >> ingest_detalles]
 
         # Etapa de procesamiento
         with TaskGroup("process_stage") as process_stage:
             process_products_sold = BashOperator(
                 task_id='process_products_sold',
-                bash_command='ssh hadoop@172.17.0.2 /home/hadoop/spark/bin/spark-submit --files /home/hadoop/hive/conf/hive-site.xml /home/hadoop/scripts/ej9_sqoop/process_products_sold.py '
+                bash_command="""
+                export PATH=/home/hadoop/spark/bin:/usr/lib/sqoop/bin:$PATH &&
+                ssh hadoop@172.17.0.2 '/home/hadoop/spark/bin/spark-submit --files /home/hadoop/hive/conf/hive-site.xml /home/hadoop/scripts/ej9_sqoop/insert_products_sold.py '
+                """
             )
 
             process_products_sent = BashOperator(
                 task_id='process_products_sent',
-                bash_command='ssh hadoop@172.17.0.2 /home/hadoop/spark/bin/spark-submit --files /home/hadoop/hive/conf/hive-site.xml /home/hadoop/scripts/ej9_sqoop/process_products_sent.py '
+                bash_command="""
+                export PATH=/home/hadoop/spark/bin:/usr/lib/sqoop/bin:$PATH &&
+                ssh hadoop@172.17.0.2 '/home/hadoop/spark/bin/spark-submit --files /home/hadoop/hive/conf/hive-site.xml /home/hadoop/scripts/ej9_sqoop/insert_products_sent.py '
+                """
             )
 
             # Dependencias en la etapa de procesamiento
-            [process_products_sold, process_products_sent]
+            [process_products_sold >> process_products_sent]
 
         # Final del proceso
         end_process = DummyOperator(
@@ -407,3 +426,9 @@ de datos)
         # Dependencias entre etapas
         start_process >> ingest_stage >> process_stage >> end_process
     ```
+
+    Capturas de pantalla del DAG en Airflow
+
+    ![alt text](image-7.png)
+    ![alt text](image-8.png)
+    ![alt text](image-9.png)

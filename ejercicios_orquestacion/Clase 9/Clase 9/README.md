@@ -432,3 +432,20 @@ de datos)
     ![alt text](image-7.png)
     ![alt text](image-8.png)
     ![alt text](image-9.png)
+
+### Importante - archivo de configuración core-site.xml
+
+Dentro de la configuración de Spark en el entorno de Hadoop, es necesario agregar la configuración de HDFS para que Spark pueda acceder a los archivos de HDFS. Para ello, se debe modificar el archivo core-site.xml ubicado en la carpeta de configuración de Spark.
+
+```xml
+<property>
+  <name>fs.defaultFS</name>
+  <value>hdfs://172.17.0.2:9000</value>
+</property>
+```
+
+De esta manera se establece la dirección del sistema de archivos HDFS como el valor por defecto para Spark. Con esta configuración, Spark podrá acceder a los archivos de HDFS y realizar operaciones de lectura y escritura en el sistema de archivos distribuido.
+
+### Conclusiones
+
+En este ejercicio se ha logrado integrar y analizar datos del sistema de gestión de bases de datos relacionales Northwind en un entorno distribuido de datos utilizando herramientas como Sqoop, Hive y Airflow. Se ha realizado la extracción de datos desde una base de datos relacional hacia HDFS y Hive, la creación de tablas optimizadas en Hive para análisis de datos, la orquestación del flujo de trabajo mediante DAGs en Airflow y la realización de consultas en Hive para obtener información analítica de los datos importados.

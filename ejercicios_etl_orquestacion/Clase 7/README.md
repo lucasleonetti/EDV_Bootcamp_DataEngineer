@@ -162,3 +162,7 @@ base de datos)
     ![alt text](image-5.png)
 
     ![alt text](image-6.png)
+
+## Conclusiones
+
+En este ejercicio, hemos creado un pipeline de datos que descarga archivos de viajes de taxis en NYC, los ingesta en HDFS, los procesa con Spark y finalmente inserta los datos procesados en una tabla de Hive. Este pipeline fue orquestado con Apache Airflow, lo que nos permitió automatizar todo el proceso y ejecutarlo de manera programada.

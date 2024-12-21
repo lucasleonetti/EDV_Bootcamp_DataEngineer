@@ -186,3 +186,7 @@ transformaciones:
     ![alt text](image-5.png)
 
     ![alt text](image-6.png)
+
+## Conclusiones
+
+En este ejercicio se realizó la ingestión de un archivo CSV a HDFS utilizando Apache NiFi, realizando ciertas transformaciones en los datos antes de ser almacenados en Hive. Para ello, se utilizó Apache Airflow para orquestar el proceso de transformación y carga de datos. Se creó un script en NiFi para descargar el archivo `titanic.csv` y se creó un flujo en NiFi para tomar el archivo, moverlo a otro directorio y luego ingresarlo en HDFS. Luego, se creó un pipeline en Airflow que ingesta el archivo `titanic.csv` y lo carga en Hive, realizando las transformaciones solicitadas. Se creó un script en PySpark para realizar las transformaciones y cargar los datos en Hive. Finalmente, se ejecutó el pipeline en Airflow y se verificó que los datos se cargaron correctamente en Hive.

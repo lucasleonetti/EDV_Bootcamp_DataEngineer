@@ -245,3 +245,7 @@ base de datos)
     ![alt text](image-5.png)
 
     ![alt text](image-6.png)
+
+## Conclusiones
+
+En este ejercicio se realizó la creación de tablas externas en Hive, la ingesta de datos en HDFS, la creación de un script en PySpark para procesar los datos y la orquestación de todo el proceso con Apache Airflow. Se logró insertar los datos pertinentes al analisis en las tablas driver_results y constructor_results los corredores con mayor cantidad de puntos en la historia y los constructores que obtuvieron más puntos en el Spanish Grand Prix en el año 1991.

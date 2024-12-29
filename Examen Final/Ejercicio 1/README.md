@@ -76,8 +76,9 @@ hacer sus recomendaciones con respecto al estado actual.
 
 ### 2 - Creación de Tablas en Hive (nuestro data warehouse en este caso)
 
+Punto 2
+
 Los siguientes comandos SQL crean las tablas requeridas en Hive:
-(punto 2)
 
 ```sql
 
@@ -131,13 +132,15 @@ LOCATION '/aviation_data/airport_details';
 
 ### 3 - Orquestacion  y Transformación
 
+Punto 3
+
 DAG de Airflow para la ingesta y transformación
 Estructura del DAG:
 
 - Tarea de ingesta: `ingest.sh` para descargar y cargar los archivos a HDFS.
 - Tareas de transformación: Scripts PySpark `transform_vuelos.py` y `transform_aeropuertos.py` para realizar las transformaciones y cargar los datos en Hive.
 
-DAG de Airflow para la ingesta y transformación de los datos de aviación civil `dag_anac.py`: (punto 3)
+DAG de Airflow para la ingesta y transformación de los datos de aviación civil `dag_anac.py`:
 
 ```python
 from airflow import DAG
@@ -212,9 +215,11 @@ with DAG(
 ![alt text](image.png)
 ![alt text](image-1.png)
 
+Punto 4
+
 Script para la transformación de datos de vuelos - PySpark `transform_vuelos.py`:
-transformaciones de los datos de vuelos, incluyendo la normalización de nombres de columnas, filtrado de vuelos domésticos, unión de datasets, transformación de tipos, manejo de valores nulos y filtrado por rango de fechas
-(punto 4)
+
+Transformaciones de los datos de vuelos, incluyendo la normalización de nombres de columnas, filtrado de vuelos domésticos, unión de datasets, transformación de tipos, manejo de valores nulos y filtrado por rango de fechas
 
 ```python
 from pyspark.sql import SparkSession
@@ -286,8 +291,11 @@ vuelos_df.write.mode("overwrite").insertInto(f"{hive_db}.{hive_table}")
 spark.stop()
 ```
 
+Punto 4
+
 Script para la transformación de datos de aeropuertos - PySpark `transform_aeropuertos.py`:
-transformaciones de los datos de aeropuertos, incluyendo la normalización de nombres de columnas, eliminación de columnas innecesarias, manejo de valores nulos y cast de tipos (punto 4)
+
+transformaciones de los datos de aeropuertos, incluyendo la normalización de nombres de columnas, eliminación de columnas innecesarias, manejo de valores nulos y cast de tipos de datos
 
 ```python
 from pyspark.sql import SparkSession
@@ -336,7 +344,9 @@ aeropuertos_df.write.mode("overwrite").insertInto(f"{hive_db}.{hive_table_aeropu
 spark.stop()
 ```
 
-Punto 5 Tipos de campos en las tablas de Hive:
+Punto 5
+
+Tipos de campos en las tablas de Hive:
 
 Tabla `aeropuerto_tabla`:
 ![alt text](image-2.png)
@@ -346,8 +356,145 @@ Tabla `aeropuerto_detalles_tabla`:
 
 ### Análisis de Datos
 
-Punto 6 Consultas SQL para responder a las preguntas de negocio:
+Punto 6
 
-Determinar la cantidad de vuelos entre las fechas 01/12/2021 y 31/01/2022. Mostrar
-consulta y Resultado de la query
+Consultas SQL para responder a las preguntas de negocio:
+Para trabajar con las tablas en Hive, se pueden ejecutar consultas SQL para responder a las preguntas de negocio planteadas. Se utilizo DBeaver para ejecutar las mismas.
 
+>Determinar la cantidad de vuelos entre las fechas 01/12/2021 y 31/01/2022.
+
+```sql
+SELECT COUNT(*) AS cantidad_vuelos
+FROM aeropuerto_tabla
+WHERE fecha BETWEEN '2021-12-01' AND '2022-01-31';
+```
+
+![alt text](image-4.png)
+
+Punto 7
+
+>Cantidad de pasajeros que viajaron en Aerolíneas Argentinas entre el 01/01/2021 y
+30/06/2022.
+
+```sql
+SELECT SUM(pasajeros) AS total_pasajeros
+FROM aeropuerto_tabla
+WHERE aerolinea_nombre = 'AEROLINEAS ARGENTINAS SA'
+  AND fecha BETWEEN '2021-01-01' AND '2022-06-30';
+```
+
+![alt text](image-6.png)
+
+Punto 8
+
+>Mostrar fecha, hora, código aeropuerto salida, ciudad de salida, código de aeropuerto
+de arribo, ciudad de arribo, y cantidad de pasajeros de cada vuelo, entre el 01/01/2022
+y el 30/06/2022 ordenados por fecha de manera descendiente.
+
+```sql
+SELECT 
+    vuelos.fecha,
+    vuelos.hora_utc,
+    vuelos.aeropuerto AS codigo_aeropuerto_salida,
+    salida.denominacion AS ciudad_salida,
+    CASE 
+        WHEN vuelos.tipo_de_movimiento = 'Aterrizaje' THEN vuelos.aeropuerto
+        ELSE vuelos.origen_destino
+    END AS codigo_aeropuerto_arribo,
+    CASE 
+        WHEN vuelos.tipo_de_movimiento = 'Aterrizaje' THEN llegada.denominacion
+        ELSE salida.denominacion
+    END AS ciudad_arribo,
+    vuelos.pasajeros
+FROM 
+    aeropuerto_tabla AS vuelos
+LEFT JOIN 
+    aeropuerto_detalles_tabla AS salida
+ON 
+    vuelos.aeropuerto = salida.aeropuerto
+LEFT JOIN 
+    aeropuerto_detalles_tabla AS llegada
+ON 
+    vuelos.origen_destino = llegada.aeropuerto
+WHERE 
+    vuelos.fecha BETWEEN '2022-01-01' AND '2022-06-30'
+ORDER BY 
+    vuelos.fecha DESC;
+```
+
+![alt text](image-5.png)
+
+Punto 9
+
+>Las 10 aerolíneas que más pasajeros llevaron entre el 01/01/2021 y el
+30/06/2022 exceptuando aquellas aerolíneas que no tengan nombre
+
+```sql
+SELECT 
+    aerolinea_nombre,
+    SUM(pasajeros) AS total_pasajeros
+FROM 
+    aeropuerto_tabla
+WHERE 
+    fecha BETWEEN '2021-01-01' AND '2022-06-30'
+    AND aerolinea_nombre IS NOT NULL
+    AND aerolinea_nombre != ''
+GROUP BY 
+    aerolinea_nombre
+ORDER BY 
+    total_pasajeros DESC
+LIMIT 10;
+```
+
+![alt text](image-7.png)
+
+Punto 10
+
+>Las 10 aeronaves más utilizadas entre el 01/01/2021 y el 30/06/22 que
+despegaron desde la Ciudad autónoma de Buenos Aires o de Buenos Aires,
+exceptuando aquellas aeronaves que no cuentan con nombre
+
+```sql
+SELECT 
+    aeronave,
+    COUNT(*) AS total_vuelos
+FROM 
+    aeropuerto_tabla
+WHERE 
+    fecha BETWEEN '2021-01-01' AND '2022-06-30'
+    AND LOWER(origen_destino) IN ('aep', 'eze') -- Filtra por códigos de Aeroparque (AEP) y Ezeiza (EZE)
+    AND aeronave IS NOT NULL
+    AND aeronave != ''
+GROUP BY 
+    aeronave
+ORDER BY 
+    total_vuelos DESC
+LIMIT 10;
+```
+
+![alt text](image-8.png)
+
+Punto 11
+
+> *Qué datos externos agregaría en este dataset que mejoraría el análisis de los datos?*
+
+Agregaria informacion sobre el clima en las ciudades de origen y destino, analizar si el mismo influye en la cantidad de vuelos y pasajeros. También agregaría información sobre el estado de los aeropuertos, como si están en funcionamiento, si hay demoras, etc. Además, inlcuir información sobre la puntualidad de las aerolíneas y la cantidad de vuelos cancelados, para poder analizar la calidad del servicio de las aerolíneas asi como tambien informacion socioeconomica de las ciudades de origen y destino para poder analizar si influye en la cantidad de vuelos y pasajeros.
+
+Encuestas de satisfacción de los pasajeros para poder correlacionar la percepcion del servicio con el rendimiento de las aerolíneas y los aeropuertos. Agregar datos sobre el trafico en los aeropuertos para poder analizar si influye en la cantidad de vuelos y pasajeros y evaluar su impacto en retrasos y cancelaciones de vuelos.
+
+Punto 12
+
+> *Conclusiones y Recomendaciones*
+
+En base a los análisis realizados, se puede concluir que la cantidad de vuelos y pasajeros en Argentina ha disminuido en el primer semestre de 2022 en comparación con el año 2021. Aerolíneas Argentinas es la aerolínea que más pasajeros ha transportado en el período analizado, seguida por Jet Smart y Flybondi. Las aeronaves más utilizadas en vuelos desde Buenos Aires son los EMB-ERJ (Embraer) y Boeing 737-800 seguidos por el Airbus A-320.
+
+Se recomienda realizar un análisis más detallado de los factores que influyen en la disminución de la cantidad de vuelos y pasajeros, como la situación económica, la situacion post pandemia de COVID-19, las restricciones de viaje y la competencia en el mercado aéreo. Además, se sugiere agregar datos externos como el clima, el estado de los aeropuertos, la puntualidad de las aerolíneas y las encuestas de satisfacción de los pasajeros.
+
+Se recomeindo crear Dashboards interactivos para visualizar los datos y realizar análisis más detallados y dinámicos. También se sugiere implementar un sistema de alertas para detectar anomalías en los datos y tomar medidas preventivas en caso de problemas.
+
+Punto 13
+
+>*Proponer una arquitectura alternativa para este proceso ya sea con herramientas on
+premise o cloud (Sí aplica)*
+
+Una arquitectura alternativa para este proceso podría ser la siguiente:

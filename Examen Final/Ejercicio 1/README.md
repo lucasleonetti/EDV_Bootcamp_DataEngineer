@@ -480,7 +480,7 @@ Punto 11
 
 Agregaria informacion sobre el clima en las ciudades de origen y destino, analizar si el mismo influye en la cantidad de vuelos y pasajeros. También agregaría información sobre el estado de los aeropuertos, como si están en funcionamiento, si hay demoras, etc. Además, inlcuir información sobre la puntualidad de las aerolíneas y la cantidad de vuelos cancelados, para poder analizar la calidad del servicio de las aerolíneas asi como tambien informacion socioeconomica de las ciudades de origen y destino para poder analizar si influye en la cantidad de vuelos y pasajeros.
 
-Encuestas de satisfacción de los pasajeros para poder correlacionar la percepcion del servicio con el rendimiento de las aerolíneas y los aeropuertos. Agregar datos sobre el trafico en los aeropuertos para poder analizar si influye en la cantidad de vuelos y pasajeros y evaluar su impacto en retrasos y cancelaciones de vuelos.
+Encuestas de satisfacción de los pasajeros para poder correlacionar la percepcion del servicio con el rendimiento de las aerolíneas y los aeropuertos. Agregar datos sobre el trafico en los aeropuertos para poder analizar si influye en la cantidad de vuelos y pasajeros y evaluar su impacto en retrasos y cancelaciones.
 
 Punto 12
 
@@ -490,11 +490,50 @@ En base a los análisis realizados, se puede concluir que la cantidad de vuelos 
 
 Se recomienda realizar un análisis más detallado de los factores que influyen en la disminución de la cantidad de vuelos y pasajeros, como la situación económica, la situacion post pandemia de COVID-19, las restricciones de viaje y la competencia en el mercado aéreo. Además, se sugiere agregar datos externos como el clima, el estado de los aeropuertos, la puntualidad de las aerolíneas y las encuestas de satisfacción de los pasajeros.
 
-Se recomeindo crear Dashboards interactivos para visualizar los datos y realizar análisis más detallados y dinámicos. También se sugiere implementar un sistema de alertas para detectar anomalías en los datos y tomar medidas preventivas en caso de problemas.
+Recomiendo crear Dashboards interactivos para visualizar los datos y realizar análisis más detallados y dinámicos. También se sugiere implementar un sistema de alertas para detectar anomalías en los datos y tomar medidas preventivas en caso de problemas.
 
 Punto 13
 
 >*Proponer una arquitectura alternativa para este proceso ya sea con herramientas on
 premise o cloud (Sí aplica)*
 
-Una arquitectura alternativa para este proceso podría ser la siguiente:
+Arquitectura Propuesta en Google Cloud Platform (GCP)
+
+![alt text](image-10.png)
+
+>Descripción General
+
+La solución basada en GCP está diseñada para aprovechar la escalabilidad, facilidad de integración y servicios completamente gestionados que ofrece la plataforma. La arquitectura captura, transforma y analiza datos del tráfico aéreo mientras garantiza alta disponibilidad y una experiencia optimizada para análisis y visualización.
+
+>*Componentes Principales:*
+
+_Google Cloud Storage_: Almacena los archivos CSV de vuelos y detalles de aeropuertos cargados desde fuentes externas.
+
+_Google Cloud Functions_:
+Actúa como disparador para la ingesta y transformación de datos.
+Detecta nuevos archivos en Cloud Storage y activa procesos de transformación y carga en BigQuery.
+
+_Dataproc_: Utilizado si se requiere procesamiento masivo de datos con PySpark para preprocesamiento avanzado.
+
+_BigQuery_: Sirve como el Data Warehouse, almacenando los datos transformados para análisis y consultas ad hoc.
+
+_Cloud Composer_: Orquesta y programa los flujos de trabajo de ingesta y transformación de datos con Airflow.
+
+_Looker_: Herramienta de visualización para responder preguntas de negocio basadas en los datos cargados en BigQuery.
+
+>*Flujo de Trabajo*
+
+Cloud Functions:
+Detecta el evento de subida.
+Activa un script en Dataproc (si es necesario) o realiza directamente la transformación y carga de datos en BigQuery.
+
+Carga de Datos a Cloud Storage: Los datasets son subidos manual o automáticamente al bucket designado.
+
+BigQuery:
+Los datos transformados son almacenados en tablas optimizadas.
+
+Cloud Composer:
+Programa y orquesta los flujos de trabajo de ingesta y transformación de datos.
+
+Looker:
+Conecta a BigQuery para visualizar y analizar los datos.

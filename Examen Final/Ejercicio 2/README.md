@@ -437,3 +437,99 @@ ORDER BY
 
 ## Conclusiones y Recomendaciones
 
+Se diseñó e implementó un pipeline que transformó datos de car rentals en un formato limpio, integrado y optimizado para su análisis.
+
+Los datos finales se almacenaron en Apache Hive, integrados en un ecosistema Hadoop, permitiendo consultas estructuradas y eficientes.
+
+_Optimización y Limpieza de Datos:_
+
+Se manejaron transformaciones importantes como:
+Normalización de nombres de columnas.
+Eliminación de registros con valores nulos en campos clave (rating).
+Ajustes semánticos como pasar fueltype a minúsculas para facilitar la categorización.
+Exclusión de datos innecesarios (estado de Texas), reduciendo ruido en el análisis.
+
+_Preparación para Análisis y Visualización:_
+
+Se logró una integración completa entre datasets relacionados (car_rental y georef), asegurando datos contextualizados con información geográfica.
+La tabla en Hive está lista para alimentar dashboards y responder preguntas de negocio, alineándose con los indicadores planteados (total de alquileres, segmentación por combustible, valoración, etc.).
+
+**_Recomendaciones:_**
+
+Incorporación de Datos Externos:
+
+Datos Climatológicos:
+
+Correlacionar alquileres con condiciones climáticas para entender patrones estacionales.
+
+Datos Económicos:
+
+Como tasas de interés o índices de turismo, que podrían influir en la demanda de alquileres.
+
+Datos Demográficos:
+
+Enriquecer con información de clientes, como rangos de edad o tipo de uso (negocios, turismo, etc.).
+
+Arquitectura Híbrida o en la Nube:
+
+On-Premise y Cloud: Si bien el ejercicio utilizó un entorno Hadoop on-premise, considerar migrar o integrar herramientas cloud como Google BigQuery para mayor escalabilidad.
+Almacenamiento Intermedio: Usar un data lake para almacenar datos crudos, procesados y enriquecidos de manera independiente, facilitando re-procesamientos.
+
+Visualización y Análisis:
+
+Crear dashboards interactivos que integren herramientas como Tableau, Power BI o Google Data Studio conectados directamente a Hive.
+Desarrollar KPIs personalizados basados en preguntas de negocio, como utilización promedio de flota o valoración promedio por segmento.
+
+Documentación y Revisión:
+
+Documentar cada etapa del pipeline (ingesta, transformación, almacenamiento).
+Revisar periódicamente las transformaciones para mantener la calidad y relevancia de los datos.
+
+## Arquitectura Cloud sugerida
+
+![alt text](image-12.png)
+
+Componentes de la Arquitectura
+
+**APIs CAR RENTAL**
+
+Fuente principal de datos. Proporciona información en formato JSON o CSV sobre alquileres de automóviles.
+
+**Cloud Functions**
+
+Responsable de la ingesta de datos desde las APIs.
+Configurada para activarse por eventos (e.g., llamadas programadas o cambios en la fuente). Transforma y almacena los datos crudos en Cloud Storage.
+
+**Cloud Storage**
+
+Actúa como un repositorio centralizado para almacenar los datos en formato bruto.
+Proporciona alta disponibilidad y capacidad de escalabilidad para manejar grandes volúmenes de datos.
+
+**Dataflow**
+
+Herramienta para la transformación y procesamiento de datos en tiempo real o batch.
+
+Realiza:
+
+Limpieza y transformación de datos (e.g., normalización, eliminación de nulos, formateo).
+Unión con otras fuentes de datos si es necesario.
+Escribe los datos transformados en BigQuery para su análisis.
+
+**BigQuery**
+
+Almacén de datos analíticos para consultas rápidas y escalables.
+Permite realizar análisis multidimensionales y crear vistas para reportes específicos.
+Compatible con herramientas de visualización como Looker.
+
+**Looker**
+
+Plataforma de visualización de datos conectada directamente a BigQuery.
+Permite la creación de dashboards interactivos y reportes personalizados para responder a preguntas de negocio.
+
+**Cloud Composer**
+
+Orquesta todo el pipeline utilizando DAGs (Directed Acyclic Graphs).
+Coordina las dependencias entre tareas y asegura la ejecución fluida del proceso.
+
+## Visualización de Datos (Looker) Basado en las recomendaciones para el estado actual
+

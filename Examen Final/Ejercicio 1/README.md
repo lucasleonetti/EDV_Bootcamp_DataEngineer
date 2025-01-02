@@ -462,7 +462,8 @@ FROM
     aeropuerto_tabla
 WHERE 
     fecha BETWEEN '2021-01-01' AND '2022-06-30'
-    AND LOWER(origen_destino) IN ('aep', 'eze') -- Filtra por códigos de Aeroparque (AEP) y Ezeiza (EZE)
+    AND tipo_de_movimiento = 'Despegue' 
+    AND LOWER(aeropuerto) IN ('aep', 'eze') 
     AND aeronave IS NOT NULL
     AND aeronave != ''
 GROUP BY 
@@ -472,7 +473,7 @@ ORDER BY
 LIMIT 10;
 ```
 
-![alt text](image-8.png)
+![alt text](image-12.png)
 
 Punto 11
 
@@ -488,9 +489,9 @@ Punto 12
 
 En base a los análisis realizados, se puede concluir que la cantidad de vuelos y pasajeros en Argentina ha aumentado en el primer semestre de 2022 en comparación con el año 2021. Aerolíneas Argentinas es la aerolínea que más pasajeros ha transportado en el período analizado, seguida por Jet Smart y Flybondi. Las aeronaves más utilizadas en vuelos desde Buenos Aires son los EMB-ERJ (Embraer) y Boeing 737-800 seguidos por el Airbus A-320.
 
-Se recomienda realizar un análisis más detallado de los factores que influyen en el aumento de la cantidad de vuelos y pasajeros, como la situación económica, la situacion post pandemia de COVID-19, las restricciones de viaje y la competencia en el mercado aéreo. Además, se sugiere agregar datos externos como el clima, el estado de los aeropuertos, la puntualidad de las aerolíneas y las encuestas de satisfacción de los pasajeros.
+Recomiendo realizar un análisis más detallado de los factores que influyen en el aumento de la cantidad de vuelos y pasajeros, como la situación económica, la situacion post pandemia de COVID-19, las restricciones de viaje y la competencia en el mercado aéreo. Además, se sugiere agregar datos externos como el clima, el estado de los aeropuertos, la puntualidad de las aerolíneas y las encuestas de satisfacción de los pasajeros.
 
-Recomiendo crear Dashboards interactivos para visualizar los datos y realizar análisis más detallados y dinámicos. También se sugiere implementar un sistema de alertas para detectar anomalías en los datos y tomar medidas preventivas en caso de problemas.
+Seria bueno crear Dashboards interactivos para visualizar los datos y realizar análisis más detallados y dinámicos. También se sugiere implementar un sistema de alertas para detectar anomalías en los datos y tomar medidas preventivas en caso de problemas.
 
 Punto 13
 
@@ -499,7 +500,7 @@ premise o cloud (Sí aplica)*
 
 Arquitectura Propuesta en Google Cloud Platform (GCP)
 
-![alt text](image-10.png)
+![alt text](image-11.png)
 
 >Descripción General
 
@@ -507,33 +508,67 @@ La solución basada en GCP está diseñada para aprovechar la escalabilidad, fac
 
 >*Componentes Principales:*
 
-_Google Cloud Storage_: Almacena los archivos CSV de vuelos y detalles de aeropuertos cargados desde fuentes externas.
+**APIs ANAC**
 
-_Google Cloud Functions_:
-Actúa como disparador para la ingesta y transformación de datos.
-Detecta nuevos archivos en Cloud Storage y activa procesos de transformación y carga en BigQuery.
+Fuente principal de datos. Proporciona información en formato JSON o CSV acerca de los datos de la aviacion nacional.
 
-_Dataproc_: Utilizado si se requiere procesamiento masivo de datos con PySpark para preprocesamiento avanzado.
+**Cloud Functions**
 
-_BigQuery_: Sirve como el Data Warehouse, almacenando los datos transformados para análisis y consultas ad hoc.
+Responsable de la ingesta de datos desde las APIs.
+Configurada para activarse por eventos (e.g., llamadas programadas o cambios en la fuente). Transforma y almacena los datos crudos en Cloud Storage.
 
-_Cloud Composer_: Orquesta y programa los flujos de trabajo de ingesta y transformación de datos con Airflow.
+**Cloud Storage**
 
-_Looker_: Herramienta de visualización para responder preguntas de negocio basadas en los datos cargados en BigQuery.
+Actúa como un repositorio centralizado para almacenar los datos en formato bruto.
+Proporciona alta disponibilidad y capacidad de escalabilidad para manejar grandes volúmenes de datos.
+
+**Dataflow**
+
+Herramienta para la transformación y procesamiento de datos en tiempo real o batch.
+Realiza:
+Limpieza y transformación de datos (e.g., normalización, eliminación de nulos, formateo).
+Unión con otras fuentes de datos si es necesario.
+Escribe los datos transformados en BigQuery para su análisis.
+
+**BigQuery**
+
+Almacén de datos analíticos para consultas rápidas y escalables.
+Permite realizar análisis multidimensionales y crear vistas para reportes específicos.
+Compatible con herramientas de visualización como Looker.
+
+**Looker**
+
+Plataforma de visualización de datos conectada directamente a BigQuery.
+Permite la creación de dashboards interactivos y reportes personalizados para responder a preguntas de negocio.
+
+**Cloud Composer**
+
+Orquesta todo el pipeline utilizando DAGs (Directed Acyclic Graphs).
+Coordina las dependencias entre tareas y asegura la ejecución fluida del proceso.
 
 >*Flujo de Trabajo*
 
-Cloud Functions:
-Detecta el evento de subida.
-Activa un script en Dataproc (si es necesario) o realiza directamente la transformación y carga de datos en BigQuery.
+**Ingesta de Datos**
 
-Carga de Datos a Cloud Storage: Los datasets son subidos manual o automáticamente al bucket designado.
+Las APIs generan los datos, que son recolectados por Cloud Functions.
+Cloud Functions almacena los datos crudos en Cloud Storage.
 
-BigQuery:
-Los datos transformados son almacenados en tablas optimizadas.
+**Transformación**
 
-Cloud Composer:
-Programa y orquesta los flujos de trabajo de ingesta y transformación de datos.
+Dataflow toma los datos desde Cloud Storage, los procesa y realiza las transformaciones necesarias:
+Renombrado de columnas.
+Casteo de tipos.
+Filtrado de registros no válidos.
+Los datos procesados se envían a BigQuery.
 
-Looker:
-Conecta a BigQuery para visualizar y analizar los datos.
+**Almacenamiento y Análisis**
+
+Los datos transformados se almacenan en BigQuery, listos para consultas.
+Se crean vistas en BigQuery para responder preguntas de negocio.
+
+**Visualización**
+
+Looker conecta con BigQuery para proporcionar reportes y dashboards basados en los datos analizados.
+
+## Visualizacion de Datos (Looker Studio) Basado en las recomendaciones para el estado actual
+

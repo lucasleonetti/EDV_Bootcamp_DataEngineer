@@ -530,6 +530,3 @@ Permite la creación de dashboards interactivos y reportes personalizados para r
 
 Orquesta todo el pipeline utilizando DAGs (Directed Acyclic Graphs).
 Coordina las dependencias entre tareas y asegura la ejecución fluida del proceso.
-
-## Visualización de Datos (Looker) Basado en las recomendaciones para el estado actual
-

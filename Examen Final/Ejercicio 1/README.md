@@ -569,6 +569,3 @@ Se crean vistas en BigQuery para responder preguntas de negocio.
 **Visualización**
 
 Looker conecta con BigQuery para proporcionar reportes y dashboards basados en los datos analizados.
-
-## Visualizacion de Datos (Looker Studio) Basado en las recomendaciones para el estado actual
-

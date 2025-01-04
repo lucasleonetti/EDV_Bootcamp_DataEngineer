@@ -359,7 +359,8 @@ Tabla `aeropuerto_detalles_tabla`:
 Punto 6
 
 Consultas SQL para responder a las preguntas de negocio:
-Para trabajar con las tablas en Hive, se pueden ejecutar consultas SQL para responder a las preguntas de negocio planteadas. Se utilizo DBeaver para ejecutar las mismas.
+
+Para trabajar con las tablas en Hive, se pueden ejecutar consultas SQL para responder a las preguntas de negocio planteadas. Se utilizo DBeaver para ejecutar las mismas y Looker Studio para visualizar los resultados en forma de gráficos y tablas.
 
 >Determinar la cantidad de vuelos entre las fechas 01/12/2021 y 31/01/2022.
 
@@ -370,6 +371,7 @@ WHERE fecha BETWEEN '2021-12-01' AND '2022-01-31';
 ```
 
 ![alt text](image-4.png)
+![alt text](image-14.png)
 
 Punto 7
 
@@ -384,6 +386,7 @@ WHERE aerolinea_nombre = 'AEROLINEAS ARGENTINAS SA'
 ```
 
 ![alt text](image-6.png)
+![alt text](image-15.png)
 
 Punto 8
 
@@ -423,6 +426,7 @@ ORDER BY
 ```
 
 ![alt text](image-5.png)
+![alt text](image-17.png)
 
 Punto 9
 
@@ -439,6 +443,7 @@ WHERE
     fecha BETWEEN '2021-01-01' AND '2022-06-30'
     AND aerolinea_nombre IS NOT NULL
     AND aerolinea_nombre != ''
+    AND aerolinea_nombre != '0'
 GROUP BY 
     aerolinea_nombre
 ORDER BY 
@@ -446,7 +451,8 @@ ORDER BY
 LIMIT 10;
 ```
 
-![alt text](image-7.png)
+![alt text](image-20.png)
+![alt text](image-22.png)
 
 Punto 10
 
@@ -463,9 +469,10 @@ FROM
 WHERE 
     fecha BETWEEN '2021-01-01' AND '2022-06-30'
     AND tipo_de_movimiento = 'Despegue' 
-    AND LOWER(aeropuerto) IN ('aep', 'eze') 
+    AND LOWER(aeropuerto) IN ('aer', 'eze') 
     AND aeronave IS NOT NULL
     AND aeronave != ''
+    AND aeronave != '0'
 GROUP BY 
     aeronave
 ORDER BY 
@@ -473,7 +480,8 @@ ORDER BY
 LIMIT 10;
 ```
 
-![alt text](image-12.png)
+![alt text](image-23.png)
+![alt text](image-24.png)
 
 Punto 11
 

@@ -323,7 +323,7 @@ with DAG(
 
 ![alt text](image-3.png)
 
-## Analisis de Datos
+## Analisis de Datos y Visualizacion
 
 >Punto 5
 
@@ -343,6 +343,7 @@ WHERE
 ```
 
 ![alt text](image-6.png)
+![alt text](image-13.png)
 
 - los 5 estados con menor cantidad de alquileres
 
@@ -360,6 +361,7 @@ LIMIT 5;
 ```
 
 ![alt text](image-7.png)
+![alt text](image-14.png)
 
 - los 10 modelos (junto con su marca) de autos más rentados
 
@@ -378,6 +380,8 @@ LIMIT 10;
 ```
 
 ![alt text](image-8.png)
+![alt text](image-15.png)
+![alt text](image-16.png)
 
 - Mostrar por año, cuántos alquileres se hicieron, teniendo en cuenta automóviles
 fabricados desde 2010 a 2015
@@ -397,6 +401,7 @@ ORDER BY
 ```
 
 ![alt text](image-9.png)
+![alt text](image-17.png)
 
 - las 5 ciudades con más alquileres de vehículos ecológicos (fuelType hibrido o
 electrico)
@@ -418,6 +423,7 @@ LIMIT 5;
 ```
 
 ![alt text](image-10.png)
+![alt text](image-18.png)
 
 - el promedio de reviews, segmentando por tipo de combustible
 
@@ -434,6 +440,7 @@ ORDER BY
 ```
 
 ![alt text](image-11.png)
+![alt text](image-19.png)
 
 ## Conclusiones y Recomendaciones
 
